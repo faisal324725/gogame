@@ -1,2 +1,2 @@
 # golanggame
-untuk test menjadi programmer golang
+menjadi programmer golang
