@@ -1,0 +1,63 @@
+{{ define "PLAYdata" }}
+    <div class="table-responsive" style="padding:12px;">
+<div style="float:left; width:100%; color:black; font-size:15px; font-family:arial; text-align:right;">
+<button type="button" class="btn" data-dismiss="modal" style="padding:0 5px 0 5px"><span class="fa fa-times" style="color:#999; font-size:15px"></span></button>
+</div>
+<div style="float:left; width:100%; color:#fff; font-size:15px; font-family:arial;">
+Artist Name: <strong><input type="text" disabled="disabled" style="background:transparent; color:#fff; border:0;" id="ArtistName"></strong>
+</div>
+<div style="float:left; width:100%; color:#fff; font-size:15px; font-family:arial;">
+Album Name: <strong><input type="text" disabled="disabled" style="background:transparent; color:#fff; border:0;" id="AlbumName"></strong>
+</div>
+<div style="float:left; width:100%; text-align:center; padding:20px;">
+<img src="" name="ImageURL" width="50%"/>
+</div>
+<div style="float:left; width:100%; text-align:center; padding:20px;">
+<audio controls autoplay><source src="" type="audio/ogg"><source src="" type="audio/mpeg">Your browser does not support the audio element.</audio>
+</div>
+
+    
+    </div>
+<script>
+var data = localStorage.getItem("id");
+console.log(data);
+$('#PlayBTNModal').on('hide.bs.modal', function () { //Change #myModal with your modal id
+      $('audio').each(function(){
+        this.pause(); // Stop playing
+        this.currentTime = 0; // Reset time
+      }); 
+})
+
+var myVariable;
+$.ajax({
+	url: 'http://localhost:7000/jsedit/edit?id='+data,
+	method: "get",
+	dataType: "json",
+	contentType: 'application/json',
+	//beforeSend: function (xhr) {
+	//xhr.setRequestHeader("Authorization", "Bearer " + data['access_token']);
+	//},
+	complete: function(result){
+	//console.log(result);
+	},
+	success: function (result) {
+	//console.log(result);
+	myVariable = JSON.stringify(result);
+	var ourData = JSON.parse(myVariable);
+	//console.log(ourData);
+		var Harga = addCommas(ourData.Price);
+		$("#ArtistID").val(ourData.ArtistID);
+		$("#ArtistName").val(ourData.ArtistName);
+		$("#AlbumName").val(ourData.AlbumName);
+		$('[name="ImageURL"]').attr("src", ourData.ImageURL);
+		$('audio').attr('src', ourData.SampleURL);
+		
+		
+		$("#ReleaseDate").val(ourData.ReleaseDate);
+		$("#Price").val(Harga);
+		//$("#SampleURL").val(ourData.SampleURL);
+	}
+});
+</script>
+
+{{ end }}

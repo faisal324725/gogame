@@ -1,0 +1,97 @@
+{{ define "DELdata" }}
+    <div class="table-responsive" style="padding:12px;">
+
+	<div id="mymessage" class="messagebox"></div>
+    <form id="proses-form" enctype="application/x-www-form-urlencoded">
+<div style="float:left; width:100%; color:black; font-size:25px; margin-bottom:20px; border-bottom:1px solid #eee; font-family:arial; background:#fff; text-align:center;">
+<i class="fa fa-info-circle" style="font-size:30px; color:red"></i><br />Yakin ingin Menghapus data dibawah ini:</div>
+<div style="float:left; width:49%; color:black; font-size:15px; font-family:arial; background:#fff; text-align:center;">
+Artist Name:<br /><strong><input type="text" disabled="disabled" style="background:transparent; border:0; text-align:center" id="ArtistName"></strong>
+</div>
+<div style="float:right; width:49%; color:black; font-size:15px; font-family:arial; background:#fff; text-align:center;">
+Album Name:<br /><strong><input type="text" disabled="disabled" style="background:transparent; border:0; text-align:center" id="AlbumName"></strong>
+</div>
+<div style="float:left; width:100%; text-align:center; padding:20px;">
+<img src="" name="ImageURL" width="50%"/>
+</div>
+<div style="float:left; width:49%; color:black; font-size:15px; font-family:arial; background:#fff; text-align:center;">
+<button type="submit" class="btn btn-danger"><span class="fa fa-check-circle" style="color:white; font-size:15px"></span> OK !!!</button>
+</div>
+
+<div style="float:right; width:49%; color:black; font-size:15px; font-family:arial; background:#fff; text-align:center;">
+<button type="button" class="btn btn-success" data-dismiss="modal"><span class="fa fa-times-circle" style="color:white; font-size:15px"></span> Cancel</button>
+</div>
+    </form>
+    
+    </div>
+<script>
+var data = localStorage.getItem("id");
+console.log(data);
+    $(document).on('submit', '#proses-form', function()
+    {
+  		$.ajax({
+			url: 'http://localhost:7000/jsdelete/delete?id='+data,
+			method: "post",
+			dataType: "json",
+			contentType: 'application/json',
+			//beforeSend: function (xhr) {
+			//xhr.setRequestHeader("Authorization", "Bearer " + data['access_token']);
+			//},
+			complete: function(result){
+				console.log(result);
+			},
+			success: function (result) {
+				function updateContent() {
+					$.get('http://localhost:7000/', function(data) {
+						$("#hasilhtml").html( data );
+					});
+				}
+				setTimeout(updateContent, 5100);
+
+					$('.modal').removeClass('in');
+					$('.modal').attr("aria-hidden","true");
+					$('.modal').css("display", "none");
+					$('.modal-backdrop').remove();
+					$('body').removeClass('modal-open');
+
+				$("#mymessage").html( "Berhasil Menghapus Data" );
+				$('#mymessage').fadeIn('slow');
+				$('#mymessage').delay(5000).fadeOut('slow');
+				console.log(result);
+			}
+		});
+        return false;
+
+    });
+
+
+var myVariable;
+$.ajax({
+	url: 'http://localhost:7000/jsedit/edit?id='+data,
+	method: "get",
+	dataType: "json",
+	contentType: 'application/json',
+	//beforeSend: function (xhr) {
+	//xhr.setRequestHeader("Authorization", "Bearer " + data['access_token']);
+	//},
+	complete: function(result){
+	//console.log(result);
+	},
+	success: function (result) {
+	//console.log(result);
+	myVariable = JSON.stringify(result);
+	var ourData = JSON.parse(myVariable);
+	//console.log(ourData);
+		var Harga = addCommas(ourData.Price);
+		$("#ArtistID").val(ourData.ArtistID);
+		$("#ArtistName").val(ourData.ArtistName);
+		$("#AlbumName").val(ourData.AlbumName);
+		$('[name="ImageURL"]').attr("src", ourData.ImageURL);
+		$("#ReleaseDate").val(ourData.ReleaseDate);
+		$("#Price").val(Harga);
+		$("#SampleURL").val(ourData.SampleURL);
+	}
+});
+</script>
+
+{{ end }}

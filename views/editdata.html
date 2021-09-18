@@ -1,0 +1,198 @@
+{{ define "editdata" }}
+	{{ template "header" }}
+
+    <div class="table-responsive" style="padding:12px;">
+
+	<div id="mymessage" class="messagebox"></div>
+    
+	{{ template "menu" }}
+
+    <form id="proses-form" enctype="application/x-www-form-urlencoded">
+    <input type="hidden" id="ArtistID" />
+	<table>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td style="position:relative">
+			<label> Artist Name </label><input type="text" name="ArtistName" id="ArtistName" class="form-control" />
+			<label class="error" for="ArtistName" id="ArtistName_err">
+			<span style="width:100%; float:left;">Wajib diisi.</span><i class="fa fa-arrow-circle-down" style="font-size:10px"></i>
+			</label>
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td style="position:relative">
+			<label> Album Name </label><input type="text" name="AlbumName" id="AlbumName" class="form-control" />
+			<label class="error" for="AlbumName" id="AlbumName_err">
+			<span style="width:100%; float:left;">Wajib diisi.</span><i class="fa fa-arrow-circle-down" style="font-size:10px"></i>
+			</label>
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td>
+			<label> Image URL </label><input type="text" name="ImageURL" id="ImageURL" class="form-control" />
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td style="position:relative">
+			<label> Release Date </label><input type="text" name="ReleaseDate" id="ReleaseDate" class="form-control startdate" />
+			<label class="error" for="ReleaseDate" id="ReleaseDate_err">
+			<span style="width:100%; float:left;">Wajib diisi.</span><i class="fa fa-arrow-circle-down" style="font-size:10px"></i>
+			</label>
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td style="position:relative">
+			<label> Price </label><input type="text" name="Price" id="Price" class="form-control text-right auto" />
+			<label class="error" for="Price" id="Price_err">
+			<span style="width:100%; float:left;">Wajib diisi.</span><i class="fa fa-arrow-circle-down" style="font-size:10px"></i>
+			</label>
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td>
+			<label> Sample URL </label><input type="text" name="SampleURL" id="SampleURL" class="form-control" />
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td>
+			<input type="submit" value="Save" class="btn btn-primary" />
+			</td>
+		</tr>
+	</table>
+    </form>
+    
+    </div>
+
+  {{ template "footer" }}
+
+<script src="../assets/pemisah_angka/autoNumeric.js"></script>
+
+<script>
+	jQuery(function($) {
+		$('.auto').autoNumeric('init');
+	});
+	$('.error').hide();
+
+    $(document).on('submit', '#proses-form', function()
+    {
+
+		if($.trim($('#ArtistName').val()) == ''){
+			$("#ArtistName_err").fadeIn("slow").delay(2500).fadeOut("slow");
+			$("#ArtistName").focus();
+			return false;
+        }else{ 
+			$("#ArtistName_err").fadeOut("slow"); 
+		}
+		if($.trim($('#AlbumName').val()) == ''){
+			$("#AlbumName_err").fadeIn("slow").delay(2500).fadeOut("slow");
+			$("#AlbumName").focus();
+			return false;
+        }else{ 
+			$("#AlbumName_err").fadeOut("slow"); 
+		}
+		if($.trim($('#ReleaseDate').val()) == ''){
+			$("#ReleaseDate_err").fadeIn("slow").delay(2500).fadeOut("slow");
+			$("#ReleaseDate").focus();
+			return false;
+        }else{ 
+			$("#ReleaseDate_err").fadeOut("slow"); 
+		}
+		if($.trim($('#Price').val()) == ''){
+			$("#Price_err").fadeIn("slow").delay(2500).fadeOut("slow");
+			$("#Price").focus();
+			return false;
+        }else{ 
+			$("#Price_err").fadeOut("slow"); 
+		}
+
+  		var MyPrice = $('#Price').val().replace(',', '');
+  		var ArtistID = $('#ArtistID').val();
+		var hasil = { 
+			"ArtistID": parseInt(ArtistID), 
+			"ArtistName": $('#ArtistName').val(), 
+			"AlbumName": $('#AlbumName').val(), 
+			"ImageURL": $('#ImageURL').val(), 
+			"ReleaseDate": $('#ReleaseDate').val(), 
+			"Price": MyPrice, 
+			"SampleURL": $('#SampleURL').val() 
+		};
+		
+		var myJSON = JSON.stringify(hasil);
+
+  		$.ajax({
+			url: 'http://localhost:7000/jsupdate/update',
+			method: "post",
+			data: JSON.stringify(hasil),
+			dataType: "json",
+			contentType: 'application/json',
+			//beforeSend: function (xhr) {
+			//xhr.setRequestHeader("Authorization", "Bearer " + data['access_token']);
+			//},
+			complete: function(result){
+				console.log(result);
+			},
+			success: function (result) {
+				$("#mymessage").html( "Berhasil Merubah Data" );
+				$('#mymessage').fadeIn('slow');
+				$('#mymessage').delay(5000).fadeOut('slow');
+				console.log(result);
+			}
+		});
+        return false;
+
+    });
+
+
+
+function getQueryVariable(variable)
+{
+	var query = window.location.search.substring(1);
+	var vars = query.split("&");
+	for (var i=0;i<vars.length;i++) {
+	var pair = vars[i].split("=");
+	if(pair[0] == variable){return pair[1];}
+	}
+	return(false);
+}
+$("#ArtistID").val(getQueryVariable("id"));
+var myid = $("#ArtistID").val();
+
+
+var hasilhtml = $('#hasilhtml');
+var myVariable;
+
+$.ajax({
+	url: 'http://localhost:7000/jsedit/edit?id='+$("#ArtistID").val(),
+	method: "get",
+	dataType: "json",
+	contentType: 'application/json',
+	//beforeSend: function (xhr) {
+	//xhr.setRequestHeader("Authorization", "Bearer " + data['access_token']);
+	//},
+	complete: function(result){
+	//console.log(result);
+	},
+	success: function (result) {
+	//console.log(result);
+	myVariable = JSON.stringify(result);
+	var ourData = JSON.parse(myVariable);
+	//console.log(ourData);
+		var Harga = addCommas(ourData.Price);
+		$("#ArtistID").val(ourData.ArtistID);
+		$("#ArtistName").val(ourData.ArtistName);
+		$("#AlbumName").val(ourData.AlbumName);
+		$("#ImageURL").val(ourData.ImageURL);
+		$("#ReleaseDate").val(ourData.ReleaseDate);
+		$("#Price").val(Harga);
+		$("#SampleURL").val(ourData.SampleURL);
+	}
+});
+</script>
+
+{{ end }}

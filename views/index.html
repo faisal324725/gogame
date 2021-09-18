@@ -1,0 +1,127 @@
+{{define "index"}}
+{{ template "header" }}
+<div class="table-responsive" style="padding:12px">
+	<div id="mymessage" class="messagebox"></div>
+
+	<table><tr><td><button type="button" id="addnew" class="btn btn-primary"><span class="fa fa-plus"></span> Add New</button></td></tr></table>
+    <input type="hidden" id="mySampleID"  />
+    <input type="hidden" id="myDelID"  />
+    <div id="hasilhtml"></div>
+</div>
+{{ template "footer" }}
+<script language="javascript">
+$(document).on('click', '.DeleteBTN', function() {
+	$('#DeleteBTNModal').delay(1).show();
+	$('.modal-backdrop').delay(1).show();
+	var iddata = $(this).attr("id");  
+	$.ajax({  
+		url:"http://localhost:7000/deldata",  
+		method:"post",  
+		data:{iddata:iddata},  
+		success:function(data){
+			localStorage.setItem("id",iddata);
+			$('#iddel').html(data);
+			$('#DeleteBTNModal').modal("show");  
+		}  
+	}); 
+	return false; 
+});
+$(document).on('click', '.PlayBTN', function() {
+	$('#PlayBTNModal').delay(1).show();
+	$('.modal-backdrop').delay(1).show();
+	var iddata = $(this).attr("id");  
+	$.ajax({  
+		url:"http://localhost:7000/playdata",  
+		method:"post",  
+		data:{iddata:iddata},  
+		success:function(data){
+			localStorage.setItem("id",iddata);
+			$('#idplay').html(data);
+			$('#PlayBTNModal').modal("show");  
+		}  
+	}); 
+	return false; 
+});
+
+$(document).ready(function() {
+var hasilhtml = $('#hasilhtml');
+var myVariable;
+$.ajax({
+	url: 'http://localhost:7000/jsview',
+	method:"get",
+	//data: hasil,
+	contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+	dataType:"json",
+	//beforeSend: function (xhr) {
+	//xhr.setRequestHeader("Authorization", "Bearer " + data['access_token']);
+	//},
+	success: function (result) {
+		//console.log(JSON.stringify(result,null,4));
+		myVariable = JSON.stringify(result);
+		//console.log(myVariable);
+		var ourData = JSON.parse(myVariable);
+		//console.log(ourData);
+		var i = 0;
+		var viewhtml = '';
+			viewhtml = '<table id="example" class="table table-striped table-bordered nowrap" style="width:100%; margin-top:10px"><thead><tr class="bg-success"><th style="padding:5px; width:3%" class="text-center">Num</th><th style="padding:5px; width:40%" class="text-center">Album Name</th><th style="padding:5px; width:10%" class="text-center">Artis Name</th><th style="padding:5px; width:10%" class="text-center">Date Release</th><th style="padding:5px; width:10%" class="text-center">Sample Audio</th><th style="padding:5px; width:10%" class="text-center">Price</th><th style="padding:5px; width:12%" class="text-center">Action</th></tr></thead><tbody>';
+		$.each(ourData, function () {
+			var Harga = this.Price;
+		i++;
+			viewhtml+='<tr valign="top">'+
+			'<td style="padding:5px; text-align:right">'+i+')</td>'+
+			'<td style="padding:5px; text-align:center">'+
+			'<div style="width:20%; float:left;"><img src="'+this.ImageURL+'" width="100%" ></div>'+
+			'<div style="width:auto; float:left; padding-left:12px">'+this.AlbumName+'</div></td>'+
+			'<td style="padding:5px; text-align:center">'+this.ArtistName+'</td>'+
+			'<td style="padding:5px; text-align:center">'+this.ReleaseDate+'</td>'+
+			'<td style="padding:5px; text-align:center">'+
+			'<button class="PlayBTN btn btn-outline-dark" id="'+this.ArtistID+'"><span class="fa fa-play" style="font-size:14px"></span></button>'+
+			'</td>'+
+			'<td style="padding:5px; text-align:right">'+addCommas(Harga)+'</td>'+
+			'<td style="padding:5px; text-align:center">'+
+			'<a href="/chdata?id='+this.ArtistID+'" class="btn btn-success" style="float:left"><span class="fa fa-edit"></span> Edit</a>'+
+			'<button class="DeleteBTN btn btn-danger" id="'+this.ArtistID+'"><span class="fa fa-trash-o" style="font-size:14px"></span> DEL</button>'+
+			'</tr>';
+		});
+			viewhtml+= '</tbody></table>';
+			$('#hasilhtml').html(viewhtml);
+	},
+	error: function(xhr, status, errorThrown) {
+	}
+});
+
+
+});//end of doc ready
+</script>
+
+  <div class="modal fade" id="DeleteBTNModal" role="dialog">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <!--div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Hapus Data</h4>
+        </div-->
+        <div class="modal-body" id="iddel"></div>
+        <!--div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div-->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="PlayBTNModal" role="dialog">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content" style="background:#000">
+        <!--div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Hapus Data</h4>
+        </div-->
+        <div class="modal-body" id="idplay"></div>
+        <!--div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div-->
+      </div>
+    </div>
+  </div>
+
+{{ end }}
